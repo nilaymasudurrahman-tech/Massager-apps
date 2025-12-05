@@ -33,24 +33,18 @@
 
     <!-- Main App Layout -->
     <div id="app-container" class="app-layout" style="display: none;">
-        
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <!-- SAVED MESSAGES BUTTON -->
                 <button id="saved-msg-btn" class="icon-btn" title="Saved Messages" style="color: #f5a623;"><i class="fas fa-bookmark"></i></button>
-                
                 <button id="add-friend-btn" class="icon-btn" style="color: var(--primary-color);" title="Add Friend"><i class="fas fa-user-plus"></i></button>
                 <button id="create-group-btn" class="icon-btn" title="New Group"><i class="fas fa-users"></i></button>
                 <button id="settings-btn" class="icon-btn" title="Settings"><i class="fas fa-cog"></i></button>
                 <button id="theme-toggle" class="icon-btn"><i class="fas fa-moon"></i></button>
             </div>
-            
             <div class="search-bar" style="margin: 0 15px 10px 15px;">
-                <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Search...">
+                <i class="fas fa-search"></i><input type="text" id="search-input" placeholder="Search...">
             </div>
-
             <div class="my-profile-bar">
                 <div style="display:flex; align-items:center;">
                     <div class="my-avatar-container" id="change-profile-btn">
@@ -66,25 +60,18 @@
                 </div>
                 <i id="logout-btn" class="fas fa-sign-out-alt" style="color:#ff4b4b; cursor:pointer;" title="Logout"></i>
             </div>
-
-            <!-- Stories -->
             <div class="stories-bar" id="stories-bar">
                 <div class="story-item" id="add-story-btn">
-                    <div class="story-circle add-story"><i class="fas fa-plus"></i></div>
-                    <span class="story-name">You</span>
-                    <input type="file" id="story-input" hidden accept="image/*">
+                    <div class="story-circle add-story"><i class="fas fa-plus"></i></div><span class="story-name">You</span><input type="file" id="story-input" hidden accept="image/*">
                 </div>
                 <div id="stories-list" style="display:flex; gap:10px;"></div>
             </div>
-            
-            <!-- User List -->
             <div id="users-list" class="contact-list" style="display: flex; flex-direction: column;"></div>
         </aside>
 
         <!-- Chat Area -->
         <main class="chat-area">
             <div class="chat-header">
-                <!-- UPDATE: Added ID to make this area clickable -->
                 <div class="header-left" id="chat-header-clickable">
                     <button id="back-btn" class="back-btn"><i class="fas fa-arrow-left"></i></button>
                     <div class="header-avatar-container">
@@ -104,9 +91,6 @@
                     <button id="add-member-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-user-plus"></i></button>
                     <button id="audio-call-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-phone"></i></button>
                     <button id="video-call-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-video"></i></button>
-                    
-                    <!-- UPDATE: INFO BUTTON REMOVED FROM HERE -->
-
                     <div style="position: relative;">
                         <button id="chat-options-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-ellipsis-v"></i></button>
                         <div id="chat-dropdown" class="dropdown-menu" style="display: none;">
@@ -124,7 +108,6 @@
             </div>
 
             <div id="chat-messages" class="messages-container"></div>
-            
             <button id="scroll-bottom-btn" class="scroll-bottom-btn" style="display: none;"><i class="fas fa-arrow-down"></i></button>
             <div id="blocked-notice" style="display:none; text-align:center; padding:15px; background:var(--card-bg); color:#ff4b4b; font-weight:bold;">You blocked this user. <span id="unblock-link" style="text-decoration:underline; cursor:pointer;">Unblock</span></div>
 
@@ -160,10 +143,7 @@
         <div class="call-content auth-card" style="position:relative; max-width: 450px; text-align: left;">
             <button id="close-friend-modal" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
             <h3 style="margin-bottom: 20px;">Friends</h3>
-            <div class="input-group" style="display:flex; gap:10px;">
-                <input type="text" id="friend-search-input" placeholder="Username or Email">
-                <button id="search-friend-btn" class="primary-btn" style="width: auto; margin-top:0;"><i class="fas fa-search"></i></button>
-            </div>
+            <div class="input-group" style="display:flex; gap:10px;"><input type="text" id="friend-search-input" placeholder="Username or Email"><button id="search-friend-btn" class="primary-btn" style="width: auto; margin-top:0;"><i class="fas fa-search"></i></button></div>
             <div id="friend-search-result" style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
             <h4 style="color: var(--primary-color); margin-bottom: 10px;">Requests</h4>
             <div id="friend-requests-list" class="contact-list" style="max-height: 200px; overflow-y: auto;"></div>
@@ -190,9 +170,31 @@
     <div id="context-menu" class="context-menu" style="display: none;"><div class="reaction-bar"><span class="react-emoji">❤️</span><span class="react-emoji">😂</span><span class="react-emoji">👍</span><span class="react-emoji">😮</span><span class="react-emoji">😢</span><span class="react-emoji">🔥</span></div><div class="context-divider"></div><div class="context-item" id="ctx-reply"><i class="fas fa-reply"></i> Reply</div><div class="context-item" id="ctx-forward"><i class="fas fa-share"></i> Forward</div><div class="context-item" id="ctx-pin"><i class="fas fa-thumbtack"></i> Pin</div><div class="context-item" id="ctx-copy"><i class="fas fa-copy"></i> Copy</div><div class="context-item delete" id="ctx-delete"><i class="fas fa-trash"></i> Delete</div></div>
     <div id="create-group-modal" class="call-modal" style="display: none;"><div class="call-content auth-card" style="position:relative;"><button id="close-group-modal" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button><h3>Create Group</h3><div class="input-group"><label>Group Name</label><input type="text" id="group-name-input"></div><button id="confirm-group-btn" class="primary-btn">Create Group</button></div></div>
     <div id="image-viewer-modal" class="call-modal" style="display: none; background: rgba(0,0,0,0.95);"><span id="close-image-viewer" style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span><img id="full-screen-image" src="" style="max-width:90%; max-height:90%; border-radius:5px;"></div>
-    <div id="call-modal" class="call-modal" style="display: none;"><div class="call-content"><h3 id="call-title">Calling...</h3><div class="video-grid" id="video-grid"><video id="remote-video" autoplay playsinline class="main-video"></video><video id="local-video" autoplay playsinline muted class="my-video"></video></div><div id="audio-call-ui" style="display:none; margin-bottom: 20px;"><div class="avatar-circle" style="width:100px; height:100px; font-size:40px; margin:0 auto;"><i class="fas fa-user"></i></div><p style="color:white; margin-top:10px;">Audio Call</p></div><div class="call-controls" style="display:flex; justify-content:center; gap:20px;"><button id="mute-btn" class="control-btn"><i class="fas fa-microphone"></i></button><button id="end-call-btn" class="control-btn end"><i class="fas fa-phone-slash"></i></button><button id="camera-btn" class="control-btn"><i class="fas fa-video"></i></button></div></div></div>
     
-    <!-- Story Viewer -->
+    <!-- Call Modal (UPDATED FOR TIMER) -->
+    <div id="call-modal" class="call-modal" style="display: none;">
+        <div class="call-content">
+            <h3 id="call-title">Calling...</h3>
+            
+            <!-- Call Timer -->
+            <div id="call-timer" style="color:white; font-size:18px; margin-bottom:10px; display:none;">00:00</div>
+
+            <div class="video-grid" id="video-grid">
+                <video id="remote-video" autoplay playsinline class="main-video"></video>
+                <video id="local-video" autoplay playsinline muted class="my-video"></video>
+            </div>
+            <div id="audio-call-ui" style="display:none; margin-bottom: 20px;">
+                <div class="avatar-circle" style="width:100px; height:100px; font-size:40px; margin:0 auto;"><i class="fas fa-user"></i></div>
+                <p style="color:white; margin-top:10px;">Audio Call</p>
+            </div>
+            <div class="call-controls" style="display:flex; justify-content:center; gap:20px;">
+                <button id="mute-btn" class="control-btn"><i class="fas fa-microphone"></i></button>
+                <button id="end-call-btn" class="control-btn end"><i class="fas fa-phone-slash"></i></button>
+                <button id="camera-btn" class="control-btn"><i class="fas fa-video"></i></button>
+            </div>
+        </div>
+    </div>
+    
     <div id="story-viewer-modal" class="call-modal" style="display: none; background: #000;">
         <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;">
             <div class="story-progress-bar"><div id="story-progress-fill" class="story-progress-fill"></div></div>
