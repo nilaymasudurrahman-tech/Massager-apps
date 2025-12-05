@@ -43,7 +43,6 @@ const headerAvatarInitial = getEl("header-avatar-initial");
 const myProfileImg = getEl("my-profile-img");
 const myProfileInitial = getEl("my-profile-initial");
 const notifySound = getEl("notify-sound");
-const ringtoneSound = getEl("ringtone-sound");
 const backBtn = getEl("back-btn");
 const rightSidebar = getEl("right-sidebar");
 const infoAvatarImg = getEl("info-avatar-img");
@@ -98,7 +97,7 @@ const storyViewAvatar = getEl("story-view-avatar");
 const storyTime = getEl("story-time");
 const storyDeleteBtn = getEl("story-delete-btn");
 
-// Chat Options Menu Elements
+// Chat Options Menu Elements (NEWLY ADDED VARIABLES)
 const chatOptionsBtn = getEl("chat-options-btn");
 const chatDropdown = getEl("chat-dropdown");
 const optSearch = getEl("opt-search");
@@ -171,7 +170,7 @@ onAuthStateChanged(auth, (user) => {
 
         if ("Notification" in window) Notification.requestPermission();
 
-        initPeer(myUid); // Initialize PeerJS
+        initPeer(myUid);
         loadData(); 
         loadStories();
         listenForFriendRequests(); 
@@ -450,18 +449,24 @@ function startChat(entity) {
         headerAvatarImg.src = entity.avatar;
         headerAvatarImg.style.display = "block";
         headerAvatarInitial.style.display = "none";
+        
         chatStatus.innerText = "cloud storage";
         chatStatus.style.color = "var(--text-secondary)";
+        
+        // Hide Actions
         getEl("video-call-btn").style.display = "none"; 
         getEl("audio-call-btn").style.display = "none"; 
         getEl("add-member-btn").style.display = "none";
-        getEl("chat-options-btn").style.display = "none"; 
+        getEl("chat-options-btn").style.display = "none"; // No block/delete options needed
+        
+        // Chat ID for Saved Messages: saved_UID
         currentChatId = `saved_${myUid}`;
         currentFriendUid = null;
     } 
     else if(entity.type === 'user') {
         if(entity.avatar) { headerAvatarImg.src = entity.avatar; headerAvatarImg.style.display = "block"; headerAvatarInitial.style.display = "none"; } else { headerAvatarImg.style.display = "none"; headerAvatarInitial.style.display = "flex"; headerAvatarInitial.innerText = entity.username.charAt(0).toUpperCase(); }
         
+        // Block check
         onValue(ref(db, 'blocked/' + myUid + '/' + entity.id), (snap) => { 
             isBlocked = snap.val() === true; 
             updateBlockUI(); 
@@ -482,6 +487,7 @@ function startChat(entity) {
     chatMessagesDiv.innerHTML = ""; msgInput.disabled = false; micBtn.disabled = false; msgInput.focus(); lastMessageDate = null; lastSenderId = null; cancelReply(); editingMsgId = null; 
     loadMessages(currentChatId);
     
+    // Typing Listener
     onValue(ref(db, 'typing/' + currentChatId), (snap) => {
         if(!snap.exists()) { 
             if(entity.type === 'user' && chatStatus.innerText.includes("typing")) {
@@ -499,8 +505,9 @@ function startChat(entity) {
     onValue(ref(db, `chats/${currentChatId}/pinnedMessage`), (snap) => { const pinned = snap.val(); const pinBar = getEl("pinned-message-bar"); if(pinned) { pinBar.style.display = "flex"; getEl("pinned-text").innerText = pinned.text; pinBar.onclick = () => scrollToMessage(pinned.id); } else { pinBar.style.display = "none"; } });
 }
 
-// --- CHAT OPTIONS LOGIC ---
+// --- CHAT OPTIONS LOGIC (NEW: SEARCH, CLEAR, BLOCK) ---
 
+// 1. Search in Chat
 if(optSearch) {
     optSearch.onclick = () => {
         chatDropdown.style.display = "none";
@@ -513,6 +520,7 @@ if(closeSearch) {
     closeSearch.onclick = () => {
         chatSearchBox.style.display = "none";
         msgSearchInput.value = "";
+        // Reset view
         document.querySelectorAll(".message").forEach(el => el.style.display = "flex");
     };
 }
@@ -528,6 +536,7 @@ if(msgSearchInput) {
     };
 }
 
+// 2. Clear Chat
 if(optClear) {
     optClear.onclick = () => {
         chatDropdown.style.display = "none";
@@ -538,10 +547,12 @@ if(optClear) {
     };
 }
 
+// 3. Block User
 if(optBlock) {
     optBlock.onclick = () => {
         chatDropdown.style.display = "none";
         if(currentChat.type !== 'user') return alert("You can only block users.");
+        
         const newStatus = !isBlocked;
         if(newStatus) {
             set(ref(db, `blocked/${myUid}/${currentChat.id}`), true);
@@ -551,6 +562,7 @@ if(optBlock) {
     };
 }
 
+// Dropdown Toggle
 if(chatOptionsBtn) {
     chatOptionsBtn.onclick = (e) => {
         e.stopPropagation();
@@ -558,15 +570,18 @@ if(chatOptionsBtn) {
     };
 }
 
+// Hide Dropdown on Click Outside
 document.addEventListener("click", (e) => {
     if (chatDropdown && !chatDropdown.contains(e.target) && e.target !== chatOptionsBtn) {
         chatDropdown.style.display = "none";
     }
 });
 
+// Update Block UI Function
 function updateBlockUI() {
     const notice = getEl("blocked-notice");
     const inputArea = getEl("input-wrapper");
+    
     if(isBlocked) {
         optBlock.innerHTML = '<i class="fas fa-check"></i> Unblock User';
         notice.style.display = "block";
@@ -585,7 +600,9 @@ function updateBlockUI() {
 const chatHeaderClickable = getEl("chat-header-clickable");
 if(chatHeaderClickable) {
     chatHeaderClickable.addEventListener("click", (e) => {
+        // Prevent firing if back button is clicked
         if(e.target.closest("#back-btn")) return;
+        
         rightSidebar.classList.add("active");
         if(currentChat) {
             infoName.innerText = currentChat.username || currentChat.name;
@@ -594,6 +611,7 @@ if(chatHeaderClickable) {
         }
     });
 }
+
 getEl("close-right-sidebar").addEventListener("click", () => rightSidebar.classList.remove("active"));
 
 function loadMessages(chatId) {
@@ -607,7 +625,7 @@ function loadMessages(chatId) {
             sendLocalNotification(msg.senderName, msg.type === 'text' ? msg.text : "Sent a file");
         }
     });
-    
+        
     onChildChanged(currentChatRef, (snapshot) => { 
         const msg = snapshot.val(); 
         const msgDiv = document.getElementById(snapshot.key);
@@ -684,7 +702,7 @@ function displayMessage(msg, key) {
             const editBtn = document.getElementById('ctx-edit');
             if(editBtn) editBtn.style.display = "none";
         }
-
+        
         const menu = getEl("context-menu"); 
         menu.style.top = `${e.pageY}px`; 
         menu.style.left = `${e.pageX}px`; 
