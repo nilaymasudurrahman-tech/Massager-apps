@@ -12,7 +12,6 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--bg-color); col
 
 /* Layout */
 .app-layout { display: flex; width: 100%; max-width: 1600px; height: 100vh; margin: 0 auto; background: var(--card-bg); box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
-/* Sidebar Layout Fixed */
 .sidebar { width: 350px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); background: var(--card-bg); height: 100%; z-index: 10; flex-shrink: 0; }
 .sidebar-header { padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-shrink: 0; }
 .search-bar { width: 92%; margin: 0 auto 10px auto; background: var(--input-bg); padding: 8px 15px; border-radius: 22px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-grow: 0; height: 40px; }
@@ -27,24 +26,9 @@ body { font-family: 'Roboto', sans-serif; background-color: var(--bg-color); col
 /* Chat Area */
 .chat-area { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-color); background-image: var(--chat-bg-img); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; height: 100%; position: relative; transition: margin-right 0.3s; }
 .chat-header { background: var(--card-bg); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); height: 60px; z-index: 20; }
-
-/* UPDATE: HEADER LEFT STYLING */
-.header-left { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    flex: 1; 
-    cursor: pointer; /* Indicates clickability */
-    padding: 5px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-}
-.header-left:hover {
-    background-color: var(--hover-color);
-}
-/* Prevents back button from triggering parent hover awkwardly */
+.header-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; padding: 5px; border-radius: 5px; transition: background-color 0.2s; }
+.header-left:hover { background-color: var(--hover-color); }
 .back-btn:hover { background-color: rgba(0,0,0,0.05); border-radius: 50%; }
-
 .header-avatar-container { width: 40px; height: 40px; margin-right: 5px; }
 .header-icon-btn { background: none; border: none; cursor: pointer; color: var(--primary-color); font-size: 20px; padding: 5px; }
 
