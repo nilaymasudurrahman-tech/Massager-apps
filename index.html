@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Clone</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3390ec">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <audio id="notify-sound" src="https://proxy.notificationsounds.com/message-tones/pristine-609/download/file-sounds-1150-pristine.mp3" preload="auto"></audio>
+    <audio id="ringtone-sound" src="https://proxy.notificationsounds.com/ringtones/mystic-567/download/file-sounds-1128-mystic.mp3" loop preload="auto"></audio>
+
+    <!-- Auth Section -->
+    <div id="auth-container" class="auth-bg">
+        <div class="auth-card">
+            <i class="fab fa-telegram" style="font-size: 60px; color: #3390ec;"></i>
+            <h2 style="margin: 15px 0;">Telegram</h2>
+            <h4 id="form-title">লগইন করুন</h4>
+            <div class="input-group"><input type="text" id="username" placeholder="আপনার নাম" style="display:none;"></div>
+            <div class="input-group"><input type="email" id="email" placeholder="ইমেইল"></div>
+            <div class="input-group"><input type="password" id="password" placeholder="পাসওয়ার্ড"></div>
+            <button id="auth-btn" class="primary-btn">লগইন</button>
+            <p style="margin-top:10px; font-size:12px; text-align:right;"><span id="forgot-password" style="color:#ff4b4b; cursor:pointer;">Forgot Password?</span></p>
+            <p style="margin-top:15px; font-size:14px;">অ্যাকাউন্ট নেই? <span id="toggle-auth" style="color:#3390ec; cursor:pointer;">নিবন্ধন করুন</span></p>
+        </div>
+    </div>
+
+    <!-- Main App Layout -->
+    <div id="app-container" class="app-layout" style="display: none;">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <!-- SAVED MESSAGES BUTTON -->
+                <button id="saved-msg-btn" class="icon-btn" title="Saved Messages" style="color: #f5a623;"><i class="fas fa-bookmark"></i></button>
+                
+                <button id="add-friend-btn" class="icon-btn" style="color: var(--primary-color);" title="Add Friend"><i class="fas fa-user-plus"></i></button>
+                <button id="create-group-btn" class="icon-btn" title="New Group"><i class="fas fa-users"></i></button>
+                <button id="settings-btn" class="icon-btn" title="Settings"><i class="fas fa-cog"></i></button>
+                <button id="theme-toggle" class="icon-btn"><i class="fas fa-moon"></i></button>
+            </div>
+            
+            <div class="search-bar" style="margin: 0 15px 10px 15px;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search...">
+            </div>
+
+            <div class="my-profile-bar">
+                <div style="display:flex; align-items:center;">
+                    <div class="my-avatar-container" id="change-profile-btn">
+                        <img id="my-profile-img" class="avatar-img" style="display:none;">
+                        <div id="my-profile-initial" class="avatar-circle-small">U</div>
+                        <div class="camera-icon"><i class="fas fa-camera"></i></div>
+                    </div>
+                    <input type="file" id="profile-file-input" hidden accept="image/*">
+                    <div style="display:flex; flex-direction:column; margin-left:10px;">
+                        <small id="current-user" style="font-weight:bold; color:var(--primary-color);">Loading...</small>
+                        <small id="current-user-bio" style="font-size:11px; color:var(--text-secondary);">Available</small>
+                    </div>
+                </div>
+                <i id="logout-btn" class="fas fa-sign-out-alt" style="color:#ff4b4b; cursor:pointer;" title="Logout"></i>
+            </div>
+
+            <!-- Stories -->
+            <div class="stories-bar" id="stories-bar">
+                <div class="story-item" id="add-story-btn">
+                    <div class="story-circle add-story"><i class="fas fa-plus"></i></div>
+                    <span class="story-name">You</span>
+                    <input type="file" id="story-input" hidden accept="image/*">
+                </div>
+                <div id="stories-list" style="display:flex; gap:10px;"></div>
+            </div>
+            
+            <!-- User List -->
+            <div id="users-list" class="contact-list" style="display: flex; flex-direction: column;"></div>
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-area">
+            <div class="chat-header">
+                <!-- UPDATE: Added ID to make this area clickable -->
+                <div class="header-left" id="chat-header-clickable">
+                    <button id="back-btn" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <div class="header-avatar-container">
+                        <img id="header-avatar-img" class="avatar-img" style="display:none;">
+                        <div id="header-avatar-initial" class="avatar-circle" style="width:40px; height:40px; font-size:16px;">U</div>
+                    </div>
+                    <div class="header-info">
+                        <h4 id="chat-header-name">Select a Chat</h4>
+                        <span id="chat-status" class="status">tap to chat</span>
+                    </div>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+                    <div id="chat-search-box" class="search-bar small-search" style="display: none;">
+                        <input type="text" id="msg-search-input" placeholder="Find...">
+                        <i id="close-search" class="fas fa-times" style="cursor:pointer;"></i>
+                    </div>
+                    <button id="add-member-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-user-plus"></i></button>
+                    <button id="audio-call-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-phone"></i></button>
+                    <button id="video-call-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-video"></i></button>
+                    
+                    <!-- UPDATE: INFO BUTTON REMOVED FROM HERE -->
+
+                    <div style="position: relative;">
+                        <button id="chat-options-btn" class="header-icon-btn" style="display:none;"><i class="fas fa-ellipsis-v"></i></button>
+                        <div id="chat-dropdown" class="dropdown-menu" style="display: none;">
+                            <div id="opt-search"><i class="fas fa-search"></i> Search</div>
+                            <div id="opt-clear"><i class="fas fa-trash"></i> Clear Chat</div>
+                            <div id="opt-block"><i class="fas fa-ban"></i> Block User</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pinned-message-bar" class="pinned-bar" style="display: none;">
+                <div class="pinned-left"><div class="pinned-line"></div><div class="pinned-content"><span class="pinned-title">Pinned Message</span><span id="pinned-text" class="pinned-text">Loading...</span></div></div>
+                <button id="unpin-btn" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div id="chat-messages" class="messages-container"></div>
+            
+            <button id="scroll-bottom-btn" class="scroll-bottom-btn" style="display: none;"><i class="fas fa-arrow-down"></i></button>
+            <div id="blocked-notice" style="display:none; text-align:center; padding:15px; background:var(--card-bg); color:#ff4b4b; font-weight:bold;">You blocked this user. <span id="unblock-link" style="text-decoration:underline; cursor:pointer;">Unblock</span></div>
+
+            <div class="chat-input-area-wrapper" id="input-wrapper">
+                <div id="reply-preview" class="reply-preview" style="display: none;">
+                    <div class="reply-info"><div class="reply-title">Replying...</div><span id="reply-text-preview" class="reply-text"></span></div>
+                    <button id="close-reply" class="close-reply">&times;</button>
+                </div>
+                <div id="sticker-picker" class="sticker-picker" style="display: none;"></div>
+                <div class="chat-input-area">
+                    <button id="emoji-btn" class="emoji-btn"><i class="far fa-smile"></i></button>
+                    <button id="sticker-btn" class="emoji-btn"><i class="far fa-sticky-note"></i></button>
+                    <button class="attach-btn" id="attach-btn"><i class="fas fa-paperclip"></i></button>
+                    <input type="file" id="file-input" hidden>
+                    <input type="text" id="msg-input" placeholder="Message..." disabled>
+                    <button id="send-btn" class="send-btn" style="display:none;"><i class="fas fa-paper-plane"></i></button>
+                    <button id="mic-btn" class="mic-btn" disabled><i class="fas fa-microphone"></i></button>
+                </div>
+            </div>
+        </main>
+
+        <aside class="right-sidebar" id="right-sidebar">
+            <div class="right-header"><button id="close-right-sidebar" class="icon-btn"><i class="fas fa-times"></i></button><h3>Info</h3></div>
+            <div class="profile-info-large"><img id="info-avatar-img" src="" class="avatar-img-large" style="display:none;"><div id="info-avatar-initial" class="avatar-circle-large">U</div><h3 id="info-name">User</h3><p id="info-status" style="color:gray;">online</p></div>
+            <div id="group-members-section" style="display: none; border-top: 1px solid var(--border-color);"><h4 style="padding: 15px 15px 5px; color: var(--primary-color);">Members</h4><div id="group-members-list" class="contact-list" style="max-height: 200px; overflow-y: auto;"></div><div class="setting-item" id="leave-group-btn" style="color:red; border-top: 1px solid var(--border-color);"><i class="fas fa-sign-out-alt"></i> Leave Group</div></div>
+            <div class="media-section"><h4>Shared Media</h4><div id="shared-media-grid" class="media-grid"></div></div>
+            <div class="settings-list"><div class="setting-item" id="mute-chat-btn"><i class="fas fa-bell-slash"></i> Mute Notifications</div><div class="setting-item" id="block-user-btn" style="color:red;"><i class="fas fa-ban"></i> Block User</div></div>
+        </aside>
+    </div>
+
+    <!-- Modals -->
+    <div id="friend-modal" class="call-modal" style="display: none;">
+        <div class="call-content auth-card" style="position:relative; max-width: 450px; text-align: left;">
+            <button id="close-friend-modal" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+            <h3 style="margin-bottom: 20px;">Friends</h3>
+            <div class="input-group" style="display:flex; gap:10px;">
+                <input type="text" id="friend-search-input" placeholder="Username or Email">
+                <button id="search-friend-btn" class="primary-btn" style="width: auto; margin-top:0;"><i class="fas fa-search"></i></button>
+            </div>
+            <div id="friend-search-result" style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
+            <h4 style="color: var(--primary-color); margin-bottom: 10px;">Requests</h4>
+            <div id="friend-requests-list" class="contact-list" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="call-modal" style="display: none;">
+        <div class="call-content auth-card" style="position:relative; max-height:80vh; overflow-y:auto; text-align:left;">
+            <button id="close-settings" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button>
+            <h3 style="margin-bottom:20px; text-align:center;">Settings</h3>
+            <div class="input-group"><label>Display Name</label><input type="text" id="edit-name-input" placeholder="Your Name"></div>
+            <div class="input-group"><label>Bio / About</label><input type="text" id="edit-bio-input" placeholder="A brief description"></div>
+            <div class="input-group"><label>Chat Wallpaper</label><div class="wallpaper-grid"><div class="wall-item" style="background:#dbe1e8;" data-bg="url('https://web.telegram.org/img/bg_0.png')"></div><div class="wall-item" style="background:#e0f7fa;" data-bg="#e0f7fa"></div><div class="wall-item" style="background:#fff3e0;" data-bg="#fff3e0"></div><div class="wall-item" style="background:#f3e5f5;" data-bg="#f3e5f5"></div><div class="wall-item" style="background:#212121;" data-bg="#212121"></div></div></div>
+            <button id="save-profile-btn" class="primary-btn">Save Changes</button>
+            <hr style="margin: 20px 0; border:0; border-top:1px solid var(--border-color);">
+            <button id="delete-account-btn" style="width:100%; background:none; border:1px solid #ff4b4b; color:#ff4b4b; padding:10px; border-radius:8px; cursor:pointer; font-weight:500;"><i class="fas fa-trash-alt"></i> Delete Account</button>
+        </div>
+    </div>
+
+    <div id="add-member-modal" class="call-modal" style="display: none;"><div class="call-content auth-card" style="position:relative;"><button id="close-add-member" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button><h3>Add Member</h3><div id="add-member-list" class="contact-list" style="max-height: 300px; overflow-y: auto; text-align: left;"></div></div></div>
+    <div id="incoming-call-modal" class="call-modal" style="display: none; background: rgba(0,0,0,0.9);"><div class="call-content" style="background: transparent; color: white;"><div class="avatar-circle" style="width:120px; height:120px; font-size:50px; margin:0 auto; animation: pulse 1.5s infinite;"><i class="fas fa-user"></i></div><h2 id="caller-name" style="margin-top: 20px;">Unknown Caller</h2><p>Incoming Video Call...</p><div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px;"><button id="reject-call-btn" style="background: #ff4b4b; width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer;"><i class="fas fa-phone-slash"></i></button><button id="accept-call-btn" style="background: #00c853; width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; animation: bounce 1s infinite;"><i class="fas fa-phone"></i></button></div></div></div>
+    <div id="file-preview-modal" class="call-modal" style="display: none;"><div class="call-content auth-card" style="position:relative; text-align: center;"><button id="close-preview" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button><h3>Send File?</h3><div id="preview-container" style="margin: 20px 0; max-height: 300px; overflow: auto;"></div><button id="confirm-send-file" class="primary-btn">Send <i class="fas fa-paper-plane"></i></button></div></div>
+    <div id="forward-modal" class="call-modal" style="display: none;"><div class="call-content auth-card" style="position:relative;"><button id="close-forward" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button><h3>Forward to...</h3><div id="forward-list" class="contact-list" style="max-height: 300px; overflow-y: auto; text-align: left;"></div></div></div>
+    <div id="context-menu" class="context-menu" style="display: none;"><div class="reaction-bar"><span class="react-emoji">❤️</span><span class="react-emoji">😂</span><span class="react-emoji">👍</span><span class="react-emoji">😮</span><span class="react-emoji">😢</span><span class="react-emoji">🔥</span></div><div class="context-divider"></div><div class="context-item" id="ctx-reply"><i class="fas fa-reply"></i> Reply</div><div class="context-item" id="ctx-forward"><i class="fas fa-share"></i> Forward</div><div class="context-item" id="ctx-pin"><i class="fas fa-thumbtack"></i> Pin</div><div class="context-item" id="ctx-copy"><i class="fas fa-copy"></i> Copy</div><div class="context-item delete" id="ctx-delete"><i class="fas fa-trash"></i> Delete</div></div>
+    <div id="create-group-modal" class="call-modal" style="display: none;"><div class="call-content auth-card" style="position:relative;"><button id="close-group-modal" style="position:absolute; right:15px; top:15px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">&times;</button><h3>Create Group</h3><div class="input-group"><label>Group Name</label><input type="text" id="group-name-input"></div><button id="confirm-group-btn" class="primary-btn">Create Group</button></div></div>
+    <div id="image-viewer-modal" class="call-modal" style="display: none; background: rgba(0,0,0,0.95);"><span id="close-image-viewer" style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span><img id="full-screen-image" src="" style="max-width:90%; max-height:90%; border-radius:5px;"></div>
+    <div id="call-modal" class="call-modal" style="display: none;"><div class="call-content"><h3 id="call-title">Calling...</h3><div class="video-grid" id="video-grid"><video id="remote-video" autoplay playsinline class="main-video"></video><video id="local-video" autoplay playsinline muted class="my-video"></video></div><div id="audio-call-ui" style="display:none; margin-bottom: 20px;"><div class="avatar-circle" style="width:100px; height:100px; font-size:40px; margin:0 auto;"><i class="fas fa-user"></i></div><p style="color:white; margin-top:10px;">Audio Call</p></div><div class="call-controls" style="display:flex; justify-content:center; gap:20px;"><button id="mute-btn" class="control-btn"><i class="fas fa-microphone"></i></button><button id="end-call-btn" class="control-btn end"><i class="fas fa-phone-slash"></i></button><button id="camera-btn" class="control-btn"><i class="fas fa-video"></i></button></div></div></div>
+    
+    <!-- Story Viewer -->
+    <div id="story-viewer-modal" class="call-modal" style="display: none; background: #000;">
+        <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;">
+            <div class="story-progress-bar"><div id="story-progress-fill" class="story-progress-fill"></div></div>
+            <div style="padding: 15px; display: flex; align-items: center; color: white; z-index: 10;">
+                <img id="story-view-avatar" src="" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                <span id="story-view-name" style="font-weight: bold;">User</span>
+                <div style="margin-left: auto; display:flex; gap:15px; align-items:center;">
+                    <button id="story-delete-btn" style="background:none; border:none; color:white; font-size:20px; cursor:pointer; display:none;"><i class="fas fa-trash-alt"></i></button>
+                    <button id="close-story" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+                </div>
+            </div>
+            <img id="story-image" src="" style="flex: 1; object-fit: contain; width: 100%; max-height: 80vh;">
+            <p id="story-time" style="color: #ccc; text-align: center; padding: 10px;">Just now</p>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
